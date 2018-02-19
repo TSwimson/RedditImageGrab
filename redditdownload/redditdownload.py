@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import os
+import json
 import re
 import StringIO
 import sys
@@ -272,7 +273,8 @@ def parse_args(args):
     PARSER.add_argument('--mirror-gfycat', default=False, action='store_true', required=False,
                         help='Download available mirror in gfycat.com.')
     PARSER.add_argument('--sort-type', default=None, help='Sort the subreddit.')
-
+    PARSER.add_argument('--write-metadata', default=False, action='store_true', required=False,
+                        help='Write metadata in <filename>.json.')
     # TODO fix if regex, title contain activated
 
     parsed_argument = PARSER.parse_args(args)
@@ -452,6 +454,13 @@ def main():
                     except Exception as exc:
                         print('    %s' % (exc,))
                         ERRORS += 1
+                    if ARGS.write_metadata:
+                        METAPATH = os.path.splitext(FILEPATH)[0] + ".json"
+                        with open(METAPATH, 'w') as fp:
+                            json.dump({
+                                "url": URL,
+                                "item": ITEM,
+                            }, fp, indent=4, separators=(',', ': '))
 
                     if ARGS.num and DOWNLOADED >= ARGS.num:
                         FINISHED = True
